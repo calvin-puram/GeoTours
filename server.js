@@ -1,8 +1,12 @@
 const dotenv = require('dotenv');
 const chalk = require('chalk');
+const connectDB = require('./config/db');
 
 dotenv.config({ path: './config/config.env' });
 const app = require('./app');
+
+//connect to DB
+connectDB();
 
 const PORT = process.env.PORT || 4000;
 
