@@ -1,12 +1,15 @@
 const express = require('express');
 const morgan = require('morgan');
 
-const toursRoutes = require('./routes/toursRoute');
-const usersRoutes = require('./routes/usersRoute');
+const toursRoutes = require('./routes/tours');
+const usersRoutes = require('./routes/users');
 
 const app = express();
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('tiny'));
 }
+
+app.use('/api/v1/tours', toursRoutes);
+app.use('/api/v1/users', usersRoutes);
 
 module.exports = app;

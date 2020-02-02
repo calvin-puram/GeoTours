@@ -1,12 +1,15 @@
 const dotenv = require('dotenv');
+const chalk = require('chalk');
 
-dotenv.config({ path: './.env' });
+dotenv.config({ path: './config/config.env' });
 const app = require('./app');
 
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
   console.log(
-    `server running in ${process.env.NODE_ENV} & listening on port ${process.env.PORT}`
+    chalk.blue(
+      `server running in ${process.env.NODE_ENV} & listening on port ${process.env.PORT}`
+    )
   );
 });
