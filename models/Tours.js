@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const { Schema } = mongoose;
 
@@ -30,6 +31,7 @@ const ToursSchema = new Schema(
       type: Number,
       default: 4.5
     },
+    slug: String,
     ratingsQuantity: {
       type: Number,
       default: 0
@@ -64,6 +66,12 @@ const ToursSchema = new Schema(
 //virtual property
 ToursSchema.virtual('durationInWeeks').get(function() {
   return this.duration / 7;
+});
+
+// slug
+ToursSchema.pre('save', function(next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
 });
 
 const Tours = mongoose.model('Tours', ToursSchema);
