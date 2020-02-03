@@ -1,40 +1,17 @@
 const Tours = require('../models/Tours');
+const ApiFeatures = require('../utils/ApiFeatures');
 
 //@desc   Get All Tours
 //@route  Get api/v1/tours
 //@access public
 exports.getTours = async (req, res, next) => {
   try {
-    //1. filtering
-    let query = { ...req.query };
-    const excluded = ['page', 'sort', 'limit', 'fields'];
-    excluded.forEach(el => delete query[el]);
-    query = JSON.stringify(query).replace(
-      /\b(gt|gte|lt|lte|in)\b/,
-      match => `$${match}`
-    );
-    let queryResult = Tours.find(JSON.parse(query));
-    //2. sorting
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      queryResult = queryResult.sort(sortBy);
-    } else {
-      queryResult = queryResult.sort('-createdAt');
-    }
-    //3. fields limiting
-    if (req.query.fields) {
-      const field = req.query.fields.split(',').join(' ');
-      queryResult = queryResult.select(field);
-    } else {
-      queryResult = queryResult.select('-__v');
-    }
-    //4 pagination
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 3;
-    const skip = (page - 1) * limit;
-    queryResult = queryResult.skip(skip).limit(limit);
-
-    const tours = await queryResult;
+    const features = new ApiFeatures(Tours.find(), req.query)
+      .filter()
+      .sorting()
+      .limiting()
+      .paginate();
+    const tours = await features.model;
 
     res.status(200).json({
       success: true,
