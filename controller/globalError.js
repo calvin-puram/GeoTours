@@ -1,40 +1,40 @@
 const chalk = require('chalk');
+const AppError = require('../utils/appError');
 
-module.exports = (err, req, res, next) => {
-  const errorDev = error => {
-    res.status(error.statusCode).json({
-      status: error.status,
-      error: error,
-      msg: error.message
-    });
-  };
+//send error in development
+const sendErrorDev = (error, res) => {
+  res.status(error.statusCode).json({
+    status: error.status,
+    error,
+    stack: error.stack,
+    msg: error.message
+  });
+};
 
-  const errorProd = error => {
-    res.status(error.statusCode).json({
-      status: error.status,
-      msg: error.message
-    });
-  };
-
-  const error = { ...err };
-  error.message = err.message;
-  error.statusCode = err.statusCode || 500;
-  error.status = err.status || 'error';
-  error.stack = err.stack;
-
+// send error in production
+const sendErrorProd = (error, res) => {
   if (error.isOperational) {
-    if (process.env.NODE_ENV === 'development') {
-      errorDev(error);
-    } else if (process.env.NODE_ENV === 'production') {
-      errorProd(error);
-      
-    }
+    res.status(error.statusCode).json({
+      status: error.status,
+      msg: error.message
+    });
   } else {
-    // eslint-disable-next-line prefer-template
+    //something unexpected happens
     console.log(error);
     res.status(500).json({
       status: 'fail',
-      msg: 'something unexpected happens. Try later'
+      msg: 'something unexpected occur. please try again later'
     });
+  }
+};
+
+module.exports = (err, req, res, next) => {
+  err.status = err.status || 'error';
+  err.statusCode = err.statusCode || 500;
+
+  if (process.env.NODE_ENV === 'development') {
+    sendErrorDev(err, res);
+  } else if (process.env.NODE_ENV === 'production') {
+    sendErrorProd(err, res);
   }
 };

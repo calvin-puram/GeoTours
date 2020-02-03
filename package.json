@@ -7,7 +7,7 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "set NODE_ENV=production && nodemon server.js",
     "dev": "nodemon server.js"
   },
   "author": "calvin Job <puram.calvin@gmail.com>",
