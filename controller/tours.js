@@ -1,5 +1,6 @@
 const Tours = require('../models/Tours');
 const ApiFeatures = require('../utils/ApiFeatures');
+const AppError = require('../utils/appError');
 
 //@desc   Top Best Cheap Tours
 //@route  Get api/v1/tours/top5cheap
@@ -29,9 +30,7 @@ exports.getTours = async (req, res, next) => {
       data: tours
     });
   } catch (err) {
-    res.status(404).json({
-      msg: err.message
-    });
+    next(err);
   }
 };
 
@@ -42,14 +41,18 @@ exports.getOneTour = async (req, res, next) => {
   try {
     const tour = await Tours.findById(req.params.id);
 
+    if (!tour) {
+      return next(
+        new AppError(`No Resource Found With id: ${req.params.id}`, 404)
+      );
+    }
+
     res.status(200).json({
       success: true,
       data: tour
     });
   } catch (err) {
-    res.status(400).json({
-      msg: err.message
-    });
+    next(err);
   }
 };
 
@@ -65,9 +68,7 @@ exports.createTours = async (req, res, next) => {
       data: tour
     });
   } catch (err) {
-    res.status(404).json({
-      msg: err
-    });
+    next(new AppError('No resource found', 404));
   }
 };
 
@@ -81,14 +82,18 @@ exports.updateTour = async (req, res, next) => {
       runValidators: true
     });
 
+    if (!tour) {
+      return next(
+        new AppError(`No Resource Found With id: ${req.params.id}`, 404)
+      );
+    }
+
     res.status(200).json({
       success: true,
       data: tour
     });
   } catch (err) {
-    res.status(404).json({
-      msg: err.message
-    });
+    next(err);
   }
 };
 
@@ -97,15 +102,20 @@ exports.updateTour = async (req, res, next) => {
 //@access private
 exports.deleteTours = async (req, res, next) => {
   try {
-    await Tours.findByIdAndRemove(req.params.id);
+    const tour = await Tours.findByIdAndRemove(req.params.id);
+
+    if (!tour) {
+      return next(
+        new AppError(`No Resource Found With id: ${req.params.id}`, 404)
+      );
+    }
+
     res.status(200).json({
       success: true,
       data: {}
     });
   } catch (err) {
-    res.status(404).json({
-      msg: err.message
-    });
+    next(err);
   }
 };
 
