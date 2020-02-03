@@ -66,7 +66,7 @@ exports.createTours = async (req, res, next) => {
     });
   } catch (err) {
     res.status(404).json({
-      msg: err.message
+      msg: err
     });
   }
 };

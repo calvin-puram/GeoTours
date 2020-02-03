@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const validator = require('validator');
 
 const { Schema } = mongoose;
 
@@ -29,9 +30,16 @@ const ToursSchema = new Schema(
     },
     ratingsAverage: {
       type: Number,
-      default: 4.5
+      default: 4.5,
+      min: 1,
+      max: 5
     },
     slug: String,
+    secret: {
+      type: Boolean,
+      default: false,
+      select: false
+    },
     ratingsQuantity: {
       type: Number,
       default: 0
@@ -39,6 +47,16 @@ const ToursSchema = new Schema(
     price: {
       type: Number,
       required: [true, 'a tour must have a price']
+    },
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function(val) {
+          console.log(this.price);
+          return val < this.price;
+        },
+        message: `discount ({VALUE}) must be lower than the price (${this.price})`
+      }
     },
     summary: {
       type: String,
@@ -71,6 +89,19 @@ ToursSchema.virtual('durationInWeeks').get(function() {
 // slug
 ToursSchema.pre('save', function(next) {
   this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
+//secret tour
+ToursSchema.pre(/^find/, function(next) {
+  this.find({ secret: { $ne: true } });
+  next();
+});
+
+//aggrageation middleware
+ToursSchema.pre('aggregate', function(next) {
+  this.pipeline().unshift({ $match: { secret: { $ne: true } } });
+  console.log(this.pipeline());
   next();
 });
 
