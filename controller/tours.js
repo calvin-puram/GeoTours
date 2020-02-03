@@ -1,6 +1,16 @@
 const Tours = require('../models/Tours');
 const ApiFeatures = require('../utils/ApiFeatures');
 
+//@desc   Top Best Cheap Tours
+//@route  Get api/v1/tours/top5cheap
+//@access public
+exports.top5cheap = (req, res, next) => {
+  req.query.limit = 5;
+  req.query.sort = '-ratingsAverage, price';
+  req.query.fields = 'name, price, ratingsAverage, difficulty';
+  next();
+};
+
 //@desc   Get All Tours
 //@route  Get api/v1/tours
 //@access public

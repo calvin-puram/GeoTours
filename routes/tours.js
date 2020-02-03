@@ -4,6 +4,9 @@ const router = express.Router();
 
 const toursController = require('../controller/tours');
 
+//top5cheap
+router.get('/top5cheap', toursController.top5cheap, toursController.getTours);
+
 router
   .route('/')
   .get(toursController.getTours)
