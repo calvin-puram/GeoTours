@@ -32,7 +32,15 @@ const sendErrorProd = (error, res) => {
 const handleCastError = error => {
   const message = `this ${error.path}: ${error.value} is not valid`;
   return new AppError(message, 400);
-}
+};
+
+// handle duplicate error
+const handleDuplicate = error => {
+  const value = error.errmsg.match(/(?<=")[^"]*(?=")/)[0];
+  const message = `duplicate field entry for value: ${value}`;
+  console.log(value);
+  return new AppError(message, 400);
+};
 
 module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
@@ -45,6 +53,7 @@ module.exports = (err, req, res, next) => {
     error.message = err.message;
 
     if (error.name === 'CastError') error = handleCastError(error);
+    if (error.code === 11000) error = handleDuplicate(error);
 
     sendErrorProd(error, res);
   }

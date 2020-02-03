@@ -68,7 +68,7 @@ exports.createTours = async (req, res, next) => {
       data: tour
     });
   } catch (err) {
-    next(new AppError('No resource found', 404));
+    next(err);
   }
 };
 

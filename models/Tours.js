@@ -52,7 +52,6 @@ const ToursSchema = new Schema(
       type: Number,
       validate: {
         validator: function(val) {
-          console.log(this.price);
           return val < this.price;
         },
         message: `discount ({VALUE}) must be lower than the price (${this.price})`
