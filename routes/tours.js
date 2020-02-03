@@ -6,6 +6,9 @@ const toursController = require('../controller/tours');
 
 //top5cheap
 router.get('/top5cheap', toursController.top5cheap, toursController.getTours);
+//tour stat
+router.get('/tourstat', toursController.getTourStats);
+router.get('/monthly-plan/:year', toursController.getTourMonthlyPlan);
 
 router
   .route('/')
