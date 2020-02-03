@@ -28,6 +28,12 @@ const sendErrorProd = (error, res) => {
   }
 };
 
+// handle cast error
+const handleCastError = error => {
+  const message = `this ${error.path}: ${error.value} is not valid`;
+  return new AppError(message, 400);
+}
+
 module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
   err.statusCode = err.statusCode || 500;
@@ -35,6 +41,11 @@ module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
-    sendErrorProd(err, res);
+    let error = { ...err };
+    error.message = err.message;
+
+    if (error.name === 'CastError') error = handleCastError(error);
+
+    sendErrorProd(error, res);
   }
 };
