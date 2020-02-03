@@ -35,10 +35,15 @@ const handleCastError = error => {
 };
 
 // handle duplicate error
-const handleDuplicate = error => {
+const handleDuplicateError = error => {
   const value = error.errmsg.match(/(?<=")[^"]*(?=")/)[0];
   const message = `duplicate field entry for value: ${value}`;
-  console.log(value);
+  return new AppError(message, 400);
+};
+
+// handle validation error
+const handleValidationError = error => {
+  const message = Object.values(error.errors).join(', ');
   return new AppError(message, 400);
 };
 
@@ -53,7 +58,8 @@ module.exports = (err, req, res, next) => {
     error.message = err.message;
 
     if (error.name === 'CastError') error = handleCastError(error);
-    if (error.code === 11000) error = handleDuplicate(error);
+    if (error.code === 11000) error = handleDuplicateError(error);
+    if (error.name === 'ValidationError') error = handleValidationError(error);
 
     sendErrorProd(error, res);
   }
