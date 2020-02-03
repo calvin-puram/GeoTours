@@ -2,6 +2,11 @@ const dotenv = require('dotenv');
 const chalk = require('chalk');
 const connectDB = require('./config/db');
 
+process.on('uncaughtException', err => {
+  console.log(`UCAUGHTEXCEPTION: ${err.message}`);
+  process.exit(1);
+});
+
 dotenv.config({ path: './config/config.env' });
 const app = require('./app');
 
@@ -10,10 +15,17 @@ connectDB();
 
 const PORT = process.env.PORT || 4000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(
     chalk.blue(
       `server running in ${process.env.NODE_ENV} & listening on port ${process.env.PORT}`
     )
   );
+});
+
+process.on('unhandledRejection', err => {
+  console.log(chalk.red(`UNHANDLEDREJECTION: ${err.message}`));
+  server.close(() => {
+    process.exit(1);
+  });
 });
