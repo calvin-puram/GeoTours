@@ -12,6 +12,15 @@ const sendToken = (user, res, statusCode) => {
     expiresIn: process.env.JWT_EXPIRES
   });
 
+  const cookieOptions = {
+    httpOnly: true,
+    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  };
+
+  if (process.env.NODE_ENV === 'production') {
+    cookieOptions.secure = true;
+  }
+  res.cookie('jwt', token, cookieOptions);
   user.password = undefined;
   res.status(statusCode).json({
     success: true,
@@ -80,7 +89,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(' ')[1];
   }
-
+  console.log(req.cookies.jwt);
   if (!token) {
     return next(new AppError('you are not logged in', 401));
   }
