@@ -27,7 +27,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     password,
     photo,
     passwordConfirm,
-    passwordChangeAt
+    passwordChangeAt,
+    role
   } = req.body;
 
   const user = await Users.create({
@@ -36,7 +37,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     password,
     photo,
     passwordConfirm,
-    passwordChangeAt
+    passwordChangeAt,
+    role
   });
 
   sendToken(user, res, 201);
@@ -96,3 +98,16 @@ exports.protect = catchAsync(async (req, res, next) => {
   //authorize user
   next();
 });
+
+//@desc  user role access
+//@route middleware
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You are not authorize to perform this action', 401)
+      );
+    }
+    next();
+  };
+};

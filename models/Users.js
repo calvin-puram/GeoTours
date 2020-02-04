@@ -34,6 +34,11 @@ const UserSchema = new Schema({
       message: 'password do not match'
     }
   },
+  role: {
+    type: String,
+    enum: ['user', 'lead-guide', 'guide', 'admin'],
+    default: 'user'
+  },
   passwordChangeAt: Date,
   createdAt: {
     type: Date,
