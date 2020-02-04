@@ -11,7 +11,8 @@ const sendToken = (user, res, statusCode) => {
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES
   });
-
+    
+  user.password = undefined
   res.status(statusCode).json({
     success: true,
     token,
@@ -186,7 +187,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordConfirm = req.body.passwordConfirm;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
-  user.save();
+   await user.save();
 
   sendToken(user, res, 200);
 });
