@@ -1,3 +1,4 @@
+const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 
 const Users = require('../models/Users');
@@ -20,14 +21,22 @@ const sendToken = (user, res, statusCode) => {
 //@route  Get api/v1/users/signup
 //@access public
 exports.signup = catchAsync(async (req, res, next) => {
-  const { name, email, password, photo, passwordConfirm } = req.body;
+  const {
+    name,
+    email,
+    password,
+    photo,
+    passwordConfirm,
+    passwordChangeAt
+  } = req.body;
 
   const user = await Users.create({
     name,
     email,
     password,
     photo,
-    passwordConfirm
+    passwordConfirm,
+    passwordChangeAt
   });
 
   sendToken(user, res, 201);
@@ -50,4 +59,40 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   sendToken(user, res, 201);
+});
+
+//@desc   protect route
+//@route  middleware
+exports.protect = catchAsync(async (req, res, next) => {
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) {
+    return next(new AppError('you are not logged in', 401));
+  }
+
+  const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  // check if user exist
+  const currentUser = await Users.findById(decode.id).select('+password');
+
+  if (!currentUser) {
+    return next(new AppError('user no longer exist', 401));
+  }
+
+  if (currentUser.checkpassword(decode.iat)) {
+    return next(
+      new AppError('this user recently changed his password. login again', 401)
+    );
+  }
+
+  req.user = currentUser;
+
+  //authorize user
+  next();
 });
