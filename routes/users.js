@@ -8,6 +8,9 @@ const auth = require('../controller/auth');
 router.post('/signup', auth.signup);
 router.post('/login', auth.login);
 
+router.post('/forgotPassword', auth.forgotPassword);
+router.post('/resetPassword/:token', auth.resetPassword);
+
 router
   .route('/')
   .get(userController.getUsers)

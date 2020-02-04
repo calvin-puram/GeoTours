@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const Users = require('../models/Users');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const sendEmail = require('../utils/email');
 
 const sendToken = (user, res, statusCode) => {
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
@@ -28,7 +29,9 @@ exports.signup = catchAsync(async (req, res, next) => {
     photo,
     passwordConfirm,
     passwordChangeAt,
-    role
+    role,
+    passwordResetExpires,
+    passwordResetToken
   } = req.body;
 
   const user = await Users.create({
@@ -38,7 +41,9 @@ exports.signup = catchAsync(async (req, res, next) => {
     photo,
     passwordConfirm,
     passwordChangeAt,
-    role
+    role,
+    passwordResetExpires,
+    passwordResetToken
   });
 
   sendToken(user, res, 201);
@@ -111,3 +116,57 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+//@desc   Forgot Password
+//@route  POST api/v1/users/forgotPassword
+//@access public
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  if (!req.body.email) {
+    return next(new AppError('email field is required', 400));
+  }
+
+  const user = await Users.findOne({ email: req.body.email });
+
+  if (!user) {
+    return next(new AppError('this email is not registered', 401));
+  }
+
+  const resetToken = user.forgotPasswordToken();
+  await user.save({ validateBeforeSave: false });
+
+  const reply = `${req.protocol}://${req.get(
+    'host'
+  )}/api/v1/resetToken/${resetToken}`;
+
+  const message = `You recently requested for a password reset. You can submit a PATCH request to this URL \n ${reply}. If you don't know anything about this please ignore`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Password Reset Token <expires in 10mins time',
+      message
+    });
+
+    res.status(200).json({
+      success: true,
+      msg: 'your password reset token has been sent to your email'
+    });
+  } catch (err) {
+    console.log(err);
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError('your reset token could not be sent. Please try again', 500)
+    );
+  }
+});
+
+
+//@desc   reset Password
+//@route  PATCH api/v1/users/resetPassword
+//@access public
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  
+});
