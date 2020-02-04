@@ -6,6 +6,7 @@ const userController = require('../controller/users');
 const auth = require('../controller/auth');
 
 router.post('/signup', auth.signup);
+router.post('/login', auth.login);
 
 router
   .route('/')
