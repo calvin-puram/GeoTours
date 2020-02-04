@@ -1,4 +1,5 @@
 const { promisify } = require('util');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
 const Users = require('../models/Users');
@@ -163,10 +164,52 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
-
 //@desc   reset Password
 //@route  PATCH api/v1/users/resetPassword
 //@access public
 exports.resetPassword = catchAsync(async (req, res, next) => {
-  
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user = await Users.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    return next(new AppError('Invalid Credentials', 401));
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  user.save();
+
+  sendToken(user, res, 200);
+});
+
+//@desc   update Password
+//@route  PATCH api/v1/users/updatePassword
+//@access private
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const { currentPassword, newPassword, passwordConfirm } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return next(new AppError('all fields are required', 400));
+  }
+
+  const user = await Users.findById(req.user.id).select('+password');
+
+  if (!user || !(await user.comparePassword(currentPassword, user.password))) {
+    return next(new AppError('Invalid Credentials', 401));
+  }
+
+  user.password = newPassword;
+  user.passwordConfirm = passwordConfirm;
+  await user.save();
+
+  sendToken(user, res, 200);
 });
