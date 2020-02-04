@@ -49,6 +49,9 @@ const handleValidationError = error => {
 
 // handle invalid token
 const handleInvalidToken = () => new AppError('Invalid credential', 401);
+// handle expired token
+const handleExpiredToken = () =>
+  new AppError('your Credential has expired. Please login again', 401);
 
 module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
@@ -64,6 +67,7 @@ module.exports = (err, req, res, next) => {
     if (error.code === 11000) error = handleDuplicateError(error);
     if (error.name === 'ValidationError') error = handleValidationError(error);
     if (error.name === 'JsonWebTokenError') error = handleInvalidToken();
+    if (error.name === 'TokenExpiredError') error = handleExpiredToken();
 
     sendErrorProd(error, res);
   }
