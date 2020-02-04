@@ -47,6 +47,9 @@ const handleValidationError = error => {
   return new AppError(message, 400);
 };
 
+// handle invalid token
+const handleInvalidToken = () => new AppError('Invalid credential', 401);
+
 module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
   err.statusCode = err.statusCode || 500;
@@ -60,6 +63,7 @@ module.exports = (err, req, res, next) => {
     if (error.name === 'CastError') error = handleCastError(error);
     if (error.code === 11000) error = handleDuplicateError(error);
     if (error.name === 'ValidationError') error = handleValidationError(error);
+    if (error.name === 'JsonWebTokenError') error = handleInvalidToken();
 
     sendErrorProd(error, res);
   }
