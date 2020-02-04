@@ -5,17 +5,15 @@ const catchAsync = require('../utils/catchAsync');
 //@desc   Get All Users
 //@route  Get api/v1/users
 //@access private
-exports.getUsers = async (req, res, next) => {
-  try {
-    res.status(200).json({
-      msg: 'this is a get route'
-    });
-  } catch (err) {
-    res.status(404).json({
-      msg: 'route not found'
-    });
-  }
-};
+exports.getUsers = catchAsync(async (req, res, next) => {
+  const users = await Users.find();
+
+  res.status(200).json({
+    status: true,
+    results: users.length,
+    data: users
+  });
+});
 
 //@desc   Update Users Details
 //@route  Patch api/v1/users/
@@ -24,7 +22,9 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   const { email, name } = req.body;
 
   if (req.body.password) {
-    return next(new AppError('you can only update email and name in this route', 401));
+    return next(
+      new AppError('you can only update email and name in this route', 401)
+    );
   }
 
   const user = await Users.findByIdAndUpdate(
@@ -39,6 +39,17 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: user
+  });
+});
+
+//@desc   Delete User
+//@route  Delete api/v1/users/
+//@access private
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  await Users.findByIdAndUpdate(req.user.id, { active: false });
+  res.status(200).json({
+    success: true,
+    data: {}
   });
 });
 

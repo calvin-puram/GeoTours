@@ -40,6 +40,11 @@ const UserSchema = new Schema({
     enum: ['user', 'lead-guide', 'guide', 'admin'],
     default: 'user'
   },
+  active: {
+    type: Boolean,
+    default: true,
+    select: false
+  },
   passwordChangeAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
@@ -54,13 +59,19 @@ UserSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;
-  next()
+  next();
 });
 
 // set password change time
 UserSchema.pre('save', function(next) {
   if (!this.isModified('password') || this.isNew) return next();
   this.passwordChangeAt = Date.now() - 1000;
+  next();
+});
+
+//show only active set to true
+UserSchema.pre(/^find/, function(next) {
+  this.find({ active: true });
   next();
 });
 
