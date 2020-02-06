@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const Users = require('./Users');
 
 const { Schema } = mongoose;
 
@@ -73,7 +72,12 @@ const ToursSchema = new Schema(
       default: Date.now,
       select: false
     },
-    guides: Array
+    guides: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Users'
+      }
+    ]
   },
   {
     toJSON: { virtuals: true },
@@ -106,10 +110,10 @@ ToursSchema.pre('aggregate', function(next) {
 });
 
 //embedding users to tour
-ToursSchema.pre('save', async function(next) {
-  const guidesPromises = this.guides.map(async id => await Users.findById(id));
-  this.guides = await Promise.all(guidesPromises);
-});
+// ToursSchema.pre('save', async function(next) {
+//   const guidesPromises = this.guides.map(async id => await Users.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+// });
 
 const Tours = mongoose.model('Tours', ToursSchema);
 module.exports = Tours;
