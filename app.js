@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cors = require('cors');
 
 const toursRoutes = require('./routes/tours');
 const usersRoutes = require('./routes/users');
@@ -15,16 +16,17 @@ const app = express();
 
 //helmet
 app.use(helmet());
+app.use(cors());
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('tiny'));
 }
 app.use((req, res, next) => {
-  console.log(req.cookies.jwt);
+  console.log(req.cookies.token);
   next();
 });
 

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const Users = require('./Users');
 
 const { Schema } = mongoose;
 
@@ -71,7 +72,8 @@ const ToursSchema = new Schema(
       type: Date,
       default: Date.now,
       select: false
-    }
+    },
+    guides: Array
   },
   {
     toJSON: { virtuals: true },
@@ -101,6 +103,12 @@ ToursSchema.pre('aggregate', function(next) {
   this.pipeline().unshift({ $match: { secret: { $ne: true } } });
   console.log(this.pipeline());
   next();
+});
+
+//embedding users to tour
+ToursSchema.pre('save', async function(next) {
+  const guidesPromises = this.guides.map(async id => await Users.findById(id));
+  this.guides = await Promise.all(guidesPromises);
 });
 
 const Tours = mongoose.model('Tours', ToursSchema);

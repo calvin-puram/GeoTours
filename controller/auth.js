@@ -20,13 +20,16 @@ const sendToken = (user, res, statusCode) => {
   if (process.env.NODE_ENV === 'production') {
     cookieOptions.secure = true;
   }
-  res.cookie('jwt', token, cookieOptions);
+
   user.password = undefined;
-  res.status(statusCode).json({
-    success: true,
-    token,
-    data: user
-  });
+  res
+    .cookie('token', token, cookieOptions)
+    .status(statusCode)
+    .json({
+      success: true,
+      token,
+      data: user
+    });
 };
 
 //@desc   Register Users
@@ -88,8 +91,11 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.token) {
+    // eslint-disable-next-line prefer-destructuring
+    token = req.cookies.token;
   }
-  console.log(req.cookies.jwt);
+
   if (!token) {
     return next(new AppError('you are not logged in', 401));
   }
