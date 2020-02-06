@@ -47,6 +47,27 @@ const ToursSchema = new Schema(
       type: Number,
       required: [true, 'a tour must have a price']
     },
+    startLocation: {
+      type: {
+        type: String,
+        enum: 'Point'
+      },
+      coordinates: [Number],
+      address: String,
+      description: String
+    },
+    location: [
+      {
+        type: {
+          type: String,
+          enum: "Point"
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number
+      }
+    ]
     priceDiscount: {
       type: Number,
       validate: {
