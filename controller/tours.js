@@ -35,10 +35,7 @@ exports.getTours = catchAsync(async (req, res, next) => {
 //@route  Get api/v1/tours/:id
 //@access public
 exports.getOneTour = catchAsync(async (req, res, next) => {
-  const tour = await Tours.findById(req.params.id).populate({
-    path: 'guides',
-    select: '-__v -createdAt'
-  });
+  const tour = await Tours.findById(req.params.id);
 
   if (!tour) {
     return next(

@@ -115,5 +115,14 @@ ToursSchema.pre('aggregate', function(next) {
 //   this.guides = await Promise.all(guidesPromises);
 // });
 
+// reference user to tour
+ToursSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -createdAt'
+  });
+  next();
+});
+
 const Tours = mongoose.model('Tours', ToursSchema);
 module.exports = Tours;
