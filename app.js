@@ -11,6 +11,7 @@ const cors = require('cors');
 const toursRoutes = require('./routes/tours');
 const usersRoutes = require('./routes/users');
 const globalError = require('./controller/globalError');
+const reviewsRoute = require('./routes/reviews');
 
 const app = express();
 
@@ -25,10 +26,6 @@ app.use(cookieParser());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('tiny'));
 }
-app.use((req, res, next) => {
-  console.log(req.cookies.token);
-  next();
-});
 
 app.use(hpp());
 app.use(mongoSanitize());
@@ -43,6 +40,7 @@ app.use(xss());
 
 app.use('/api/v1/tours', toursRoutes);
 app.use('/api/v1/users', usersRoutes);
+app.use('/api/v1/reviews', reviewsRoute);
 app.use(globalError);
 
 module.exports = app;

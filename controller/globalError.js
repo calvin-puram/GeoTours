@@ -1,4 +1,3 @@
-const chalk = require('chalk');
 const AppError = require('../utils/appError');
 
 //send error in development
@@ -35,9 +34,9 @@ const handleCastError = error => {
 };
 
 // handle duplicate error
-const handleDuplicateError = error => {
-  const value = error.errmsg.match(/(?<=")[^"]*(?=")/)[0];
-  const message = `duplicate field entry for value: ${value}`;
+const handleDuplicateError = () => {
+  // const value = error.errmsg.match(/(?<=")[^"]*(?=")/)[0];
+  const message = `duplicate field entry `;
   return new AppError(message, 400);
 };
 

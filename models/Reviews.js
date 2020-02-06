@@ -28,5 +28,7 @@ const ReviewsSchma = new Schema({
   }
 });
 
+ReviewsSchma.index({ tour: 1, user: 1 }, { unique: true });
+
 const Reviews = mongoose.model('Reviews', ReviewsSchma);
 module.exports = Reviews;
