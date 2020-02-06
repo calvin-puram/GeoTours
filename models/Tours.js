@@ -60,14 +60,14 @@ const ToursSchema = new Schema(
       {
         type: {
           type: String,
-          enum: "Point"
+          enum: 'Point'
         },
         coordinates: [Number],
         address: String,
         description: String,
         day: Number
       }
-    ]
+    ],
     priceDiscount: {
       type: Number,
       validate: {

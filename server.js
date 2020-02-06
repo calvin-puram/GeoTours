@@ -3,7 +3,7 @@ const chalk = require('chalk');
 const connectDB = require('./config/db');
 
 process.on('uncaughtException', err => {
-  console.log(chalk.red(`UNCAUGHTEXCEPTION: ${err.message}`));
+  console.log(chalk.red(`UNCAUGHTEXCEPTION: ${err.stack}`));
   process.exit(1);
 });
 

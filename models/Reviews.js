@@ -23,12 +23,23 @@ const ReviewsSchma = new Schema({
   },
   tour: {
     type: Schema.Types.ObjectId,
-    ref: 'tours',
+    ref: 'Tours',
     required: true
   }
 });
 
 ReviewsSchma.index({ tour: 1, user: 1 }, { unique: true });
+
+ReviewsSchma.pre(/^find/, function(next) {
+  this.populate({
+    path: 'tour',
+    select: 'name'
+  }).populate({
+    path: 'user',
+    select: 'name photo'
+  });
+  next();
+});
 
 const Reviews = mongoose.model('Reviews', ReviewsSchma);
 module.exports = Reviews;
