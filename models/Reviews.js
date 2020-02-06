@@ -32,9 +32,6 @@ ReviewsSchma.index({ tour: 1, user: 1 }, { unique: true });
 
 ReviewsSchma.pre(/^find/, function(next) {
   this.populate({
-    path: 'tour',
-    select: 'name'
-  }).populate({
     path: 'user',
     select: 'name photo'
   });

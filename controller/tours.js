@@ -35,7 +35,7 @@ exports.getTours = catchAsync(async (req, res, next) => {
 //@route  Get api/v1/tours/:id
 //@access public
 exports.getOneTour = catchAsync(async (req, res, next) => {
-  const tour = await Tours.findById(req.params.id);
+  const tour = await Tours.findById(req.params.id).populate('reviews');
 
   if (!tour) {
     return next(

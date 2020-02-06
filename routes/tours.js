@@ -3,7 +3,11 @@ const express = require('express');
 const router = express.Router();
 
 const toursController = require('../controller/tours');
+const ReviewRouter = require('./reviews');
 const auth = require('../controller/auth');
+
+//router
+router.use('/:tourId/reviews', ReviewRouter);
 
 //top5cheap
 router.get('/top5cheap', toursController.top5cheap, toursController.getTours);

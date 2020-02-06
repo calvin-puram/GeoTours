@@ -34,9 +34,11 @@ exports.getOneReviews = catchAsync(async (req, res, next) => {
 });
 
 //@desc   Create Reviews
-//@route  Get api/v1/tours/reviews/
+//@route  Get api/v1/tours/:tourId/reviews
 //@access private
 exports.createReview = catchAsync(async (req, res, next) => {
+  req.body.tour = req.params.tourId;
+
   req.body.user = req.user.id;
   const review = await Reviews.create(req.body);
 

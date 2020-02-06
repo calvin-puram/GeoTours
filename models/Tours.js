@@ -145,5 +145,17 @@ ToursSchema.pre(/^find/, function(next) {
   next();
 });
 
+// virtual populate
+ToursSchema.virtual('reviews', {
+  ref: 'Reviews',
+  localField: '_id',
+  foreignField: 'tour'
+});
+
+// ToursSchema.pre(/^find/, function(next) {
+//   this.populate('reviews');
+//   next();
+// });
+
 const Tours = mongoose.model('Tours', ToursSchema);
 module.exports = Tours;
