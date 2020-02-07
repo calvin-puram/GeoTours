@@ -1,7 +1,8 @@
 const Tours = require('../models/Tours');
-const ApiFeatures = require('../utils/ApiFeatures');
+
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const factory = require('./factoryHandler');
 
 //@desc   Top Best Cheap Tours
 //@route  Get api/v1/tours/top5cheap
@@ -16,89 +17,26 @@ exports.top5cheap = (req, res, next) => {
 //@desc   Get All Tours
 //@route  Get api/v1/tours
 //@access public
-exports.getTours = catchAsync(async (req, res, next) => {
-  const features = new ApiFeatures(Tours.find(), req.query)
-    .filter()
-    .sorting()
-    .limiting()
-    .paginate();
-  const tours = await features.model;
-
-  res.status(200).json({
-    success: true,
-    results: tours.length,
-    data: tours
-  });
-});
-
+exports.getTours = factory.getHandler(Tours);
 //@desc   Get Single Tours
 //@route  Get api/v1/tours/:id
 //@access public
-exports.getOneTour = catchAsync(async (req, res, next) => {
-  const tour = await Tours.findById(req.params.id).populate('reviews');
-
-  if (!tour) {
-    return next(
-      new AppError(`No Resource Found With id: ${req.params.id}`, 404)
-    );
-  }
-
-  res.status(200).json({
-    success: true,
-    data: tour
-  });
+exports.getOneTour = factory.getSingleHandler(Tours, {
+  path: 'reviews',
+  select: 'name photo'
 });
-
 //@desc   Create Tours
 //@route  POST api/v1/tours/
-//@access public
-exports.createTours = catchAsync(async (req, res, next) => {
-  const tour = await Tours.create(req.body);
-
-  res.status(201).json({
-    success: true,
-    data: tour
-  });
-});
-
+//@access private
+exports.createTours = factory.createHandler(Tours);
 //@desc   Update Tours
 //@route  POST api/v1/tours/:id
 //@access private
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tours.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
-
-  if (!tour) {
-    return next(
-      new AppError(`No Resource Found With id: ${req.params.id}`, 404)
-    );
-  }
-
-  res.status(200).json({
-    success: true,
-    data: tour
-  });
-});
-
-//@desc   Delete Tours
-//@route  Delete api/v1/tours/:id
+exports.updateTour = factory.updateHandler(Tours);
+//@desc   delete Tours
+//@route  POST api/v1/tours/:id
 //@access private
-exports.deleteTours = catchAsync(async (req, res, next) => {
-  const tour = await Tours.findByIdAndRemove(req.params.id);
-
-  if (!tour) {
-    return next(
-      new AppError(`No Resource Found With id: ${req.params.id}`, 404)
-    );
-  }
-
-  res.status(200).json({
-    success: true,
-    data: {}
-  });
-});
+exports.deleteTours = factory.deleteHandler(Tours);
 
 //@desc   Get Tours stats
 //@route  Get api/v1/tours/tourstats

@@ -1,21 +1,12 @@
 const Reviews = require('../models/Reviews');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const factory = require('./factoryHandler');
 
 //@desc   Get All Reviews
 //@route  Get api/v1/tours/reviews
 //@access public
-exports.getReviews = catchAsync(async (req, res, next) => {
-  let filter = {};
-  if (req.params.tourId) filter = { tour: req.params.tourId };
-  const reviews = await Reviews.find(filter);
-
-  res.status(200).json({
-    success: true,
-    results: reviews.length,
-    data: reviews
-  });
-});
+exports.getReviews = factory.getHandler(Reviews);
 
 //@desc   Get Single Reviews
 //@route  Get api/v1/tours/reviews/:id
@@ -40,7 +31,6 @@ exports.getOneReviews = catchAsync(async (req, res, next) => {
 //@access private
 exports.createReview = catchAsync(async (req, res, next) => {
   req.body.tour = req.params.tourId;
-
   req.body.user = req.user.id;
   const review = await Reviews.create(req.body);
 

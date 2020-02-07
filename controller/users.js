@@ -1,19 +1,7 @@
 const Users = require('../models/Users');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
-
-//@desc   Get All Users
-//@route  Get api/v1/users
-//@access private
-exports.getUsers = catchAsync(async (req, res, next) => {
-  const users = await Users.find();
-
-  res.status(200).json({
-    status: true,
-    results: users.length,
-    data: users
-  });
-});
+const factory = require('./factoryHandler');
 
 //@desc   Update Users Details
 //@route  Patch api/v1/users/
@@ -53,62 +41,23 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
+//@desc   Get All Users
+//@route  Get api/v1/users
+//@access private
+exports.getUsers = factory.getHandler(Users);
 //@desc   Get Single User
 //@route  Get api/v1/uses/:id
 //@access private
-exports.getOneUser = async (req, res, next) => {
-  try {
-    res.status(200).json({
-      msg: `this is a get route with id ${req.params.id} `
-    });
-  } catch (err) {
-    res.status(404).json({
-      msg: `route not found with id: ${req.params.id}`
-    });
-  }
-};
-
+exports.getOneUser = factory.getSingleHandler(Users);
 //@desc   Create User
 //@route  POST api/v1/users/
 //@access private
-exports.createUser = async (req, res, next) => {
-  try {
-    res.status(201).json({
-      msg: 'this is a post route'
-    });
-  } catch (err) {
-    res.status(404).json({
-      msg: 'route not found'
-    });
-  }
-};
-
+exports.createUser = factory.createHandler(Users);
 //@desc   Update User
 //@route  POST api/v1/users/:id
 //@access private
-exports.updateUser = async (req, res, next) => {
-  try {
-    res.status(200).json({
-      msg: `this is a patch route with id ${req.params.id} `
-    });
-  } catch (err) {
-    res.status(404).json({
-      msg: `route not found with id: ${req.params.id}`
-    });
-  }
-};
-
-//@desc   Delete Users
-//@route  Delete api/v1/users/:id
+exports.updateUser = factory.updateHandler(Users);
+//@desc   Delete User
+//@route  POST api/v1/users/:id
 //@access private
-exports.deleteUser = async (req, res, next) => {
-  try {
-    res.status(200).json({
-      msg: `this is a delete route with id ${req.params.id} `
-    });
-  } catch (err) {
-    res.status(404).json({
-      msg: `route not found with id: ${req.params.id}`
-    });
-  }
-};
+exports.deleteUser = factory.deleteHandler(Users);
