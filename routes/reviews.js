@@ -5,14 +5,12 @@ const router = express.Router({ mergeParams: true });
 const reviewController = require('../controller/reviews');
 const auth = require('../controller/auth');
 
+router.use(auth.protect);
+
 router
   .route('/')
   .get(reviewController.getReviews)
-  .post(
-    auth.protect,
-    auth.restrictTo('user', 'admin'),
-    reviewController.createReview
-  );
+  .post(auth.restrictTo('user'), reviewController.createReview);
 
 router
   .route('/:id')
