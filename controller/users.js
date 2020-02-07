@@ -41,6 +41,14 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
+//@desc   Get Profile
+//@route  Delete api/v1/users/myprofile
+//@access private
+exports.myprofile = catchAsync(async (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+});
+
 //@desc   Get All Users
 //@route  Get api/v1/users
 //@access private
