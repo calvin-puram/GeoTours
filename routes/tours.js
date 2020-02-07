@@ -9,6 +9,9 @@ const auth = require('../controller/auth');
 //router
 router.use('/:tourId/reviews', ReviewRouter);
 
+//tours within
+router.get('/:distance/center/:latlng/unit/:unit', toursController.toursWithin);
+
 //top5cheap
 router.get('/top5cheap', toursController.top5cheap, toursController.getTours);
 //tour stat

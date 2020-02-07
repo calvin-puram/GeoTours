@@ -38,6 +38,37 @@ exports.updateTour = factory.updateHandler(Tours);
 //@access private
 exports.deleteTours = factory.deleteHandler(Tours);
 
+//@desc   Get Tours Within a Radius
+//@route  Get api/v1/tours/:distance/center/:latlng/unit/:unit
+//@access public
+exports.toursWithin = catchAsync(async (req, res, next) => {
+  const { distance, latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+
+  const radius = unit === 'mi' ? distance / 535 : distance / 838383;
+
+  if (!lat || !lng) {
+    return next(
+      new AppError(
+        'please provide latitude and longitude in this format: lat,lng',
+        400
+      )
+    );
+  }
+
+  const tour = await Tours.find({
+    startLocation: {
+      $geoWithin: { $centerSphere: [[lng, lat], radius] }
+    }
+  });
+
+  res.status(200).json({
+    success: true,
+    results: tour.length,
+    data: tour
+  });
+});
+
 //@desc   Get Tours stats
 //@route  Get api/v1/tours/tourstats
 //@access public

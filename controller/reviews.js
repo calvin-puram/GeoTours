@@ -52,7 +52,7 @@ exports.updateReview = catchAsync(async (req, res, next) => {
     );
   }
 
-  if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
+  if (review.user._id.toString() !== req.user.id && req.user.role !== 'admin') {
     return next(
       new AppError(`You are not authorize to perform this action`, 401)
     );
@@ -80,10 +80,11 @@ exports.deleteReview = catchAsync(async (req, res, next) => {
       new AppError(`No resource found with this id: ${req.params.id}`, 404)
     );
   }
+  
 
-  if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
+  if (review.user._id.toString() !== req.user.id && req.user.role !== 'admin') {
     return next(
-      new AppError(`You are not authorize to perform this action`, 401)
+      new AppError(`You are not authorize to perform this action yes`, 401)
     );
   }
 
