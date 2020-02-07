@@ -38,5 +38,34 @@ ReviewsSchma.pre(/^find/, function(next) {
   next();
 });
 
+// calulate average ratings
+ReviewsSchma.statics.calcRating = async function(tourId) {
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId }
+    },
+    {
+      $group: {
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        ratingsAverage: { $avg: '$rating' }
+      }
+    }
+  ]);
+  await this.model('Tours').findByIdAndUpdate(tourId, {
+    ratingsAverage: stats[0].ratingsAverage,
+    ratingsQuantity: stats[0].nRating
+  });
+};
+
+ReviewsSchma.post('save', function() {
+  this.constructor.calcRating(this.tour);
+});
+
+ReviewsSchma.pre('remove', function(next) {
+  this.constructor.calcRating(this.tour);
+  next();
+});
+
 const Reviews = mongoose.model('Reviews', ReviewsSchma);
 module.exports = Reviews;
