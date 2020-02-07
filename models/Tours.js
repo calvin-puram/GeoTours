@@ -109,6 +109,7 @@ const ToursSchema = new Schema(
 
 ToursSchema.index({ price: 1, ratingsAverage: -1 });
 ToursSchema.index({ slug: 1 });
+ToursSchema.index({ startLocation: '2dsphere' });
 
 //virtual property
 ToursSchema.virtual('durationInWeeks').get(function() {
