@@ -82,6 +82,21 @@ exports.login = catchAsync(async (req, res, next) => {
   sendToken(user, res, 201);
 });
 
+//@desc     logout Users / clear token
+//@route    Get api/v1/users/logout
+//@access   private
+exports.logout = catchAsync(async (req, res, next) => {
+  res.cookie('token', 'none', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
+});
+
 //@desc   protect route
 //@route  middleware
 exports.protect = catchAsync(async (req, res, next) => {
