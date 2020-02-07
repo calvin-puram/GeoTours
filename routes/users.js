@@ -7,19 +7,17 @@ const auth = require('../controller/auth');
 
 router.post('/signup', auth.signup);
 router.post('/login', auth.login);
-
 router.post('/forgotPassword', auth.forgotPassword);
 router.patch('/resetPassword/:token', auth.resetPassword);
-router.patch('/updatePassword', auth.protect, auth.updatePassword);
 
+router.use(auth.protect);
+
+router.patch('/updatePassword', auth.protect, auth.updatePassword);
 router.patch('/updateMe', auth.protect, userController.updateMe);
 router.delete('/deleteMe', auth.protect, userController.deleteMe);
-router.get(
-  '/myprofile',
-  auth.protect,
-  userController.myprofile,
-  userController.getOneUser
-);
+router.get('/myprofile', userController.myprofile, userController.getOneUser);
+
+router.use(auth.restrictTo('admin'));
 
 router
   .route('/')
