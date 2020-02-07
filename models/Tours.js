@@ -106,6 +106,9 @@ const ToursSchema = new Schema(
   }
 );
 
+ToursSchema.index({ price: 1, ratingsAverage: -1 });
+ToursSchema.index({ slug: 1 });
+
 //virtual property
 ToursSchema.virtual('durationInWeeks').get(function() {
   return this.duration / 7;
@@ -126,7 +129,7 @@ ToursSchema.pre(/^find/, function(next) {
 //aggrageation middleware
 ToursSchema.pre('aggregate', function(next) {
   this.pipeline().unshift({ $match: { secret: { $ne: true } } });
-  
+
   next();
 });
 
