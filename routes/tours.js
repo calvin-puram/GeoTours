@@ -11,6 +11,8 @@ router.use('/:tourId/reviews', ReviewRouter);
 
 //tours within
 router.get('/:distance/center/:latlng/unit/:unit', toursController.toursWithin);
+//calc tour diatnces
+router.get('/distance/:latlng/unit/:unit', toursController.getTourDistance);
 
 //top5cheap
 router.get('/top5cheap', toursController.top5cheap, toursController.getTours);

@@ -128,19 +128,6 @@ ToursSchema.pre(/^find/, function(next) {
   next();
 });
 
-//aggrageation middleware
-ToursSchema.pre('aggregate', function(next) {
-  this.pipeline().unshift({ $match: { secret: { $ne: true } } });
-
-  next();
-});
-
-//embedding users to tour
-// ToursSchema.pre('save', async function(next) {
-//   const guidesPromises = this.guides.map(async id => await Users.findById(id));
-//   this.guides = await Promise.all(guidesPromises);
-// });
-
 // reference user to tour
 ToursSchema.pre(/^find/, function(next) {
   this.populate({
@@ -156,11 +143,6 @@ ToursSchema.virtual('reviews', {
   localField: '_id',
   foreignField: 'tour'
 });
-
-// ToursSchema.pre(/^find/, function(next) {
-//   this.populate('reviews');
-//   next();
-// });
 
 const Tours = mongoose.model('Tours', ToursSchema);
 module.exports = Tours;
