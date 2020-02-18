@@ -1,6 +1,6 @@
 # GeoTours API
 
-> Backend Api for GeoTours application which is a tour directory. You can checkout the specs for this API. And you can check out the postman documentation [GeoTours API](https://documenter.getpostman.com/view/5936515/SzKSRyTa)
+> Backend Api for GeoTours application which is a tour directory.You can check out the postman documentation [GeoTours API](https://documenter.getpostman.com/view/5936515/SzKSRyTa)
 
 ## PROJECT ARCHITECTURE
 
