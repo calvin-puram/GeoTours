@@ -35,7 +35,6 @@ const importData = async () => {
     console.log(err.message);
   }
 };
-
 const deleteData = async () => {
   try {
     await Tours.deleteMany();
