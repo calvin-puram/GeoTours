@@ -8,7 +8,7 @@ const Reviews = require('./models/Reviews');
 
 const connectDB = require('./config/db');
 
-dotenv.config({ path: './config/config.env' });
+dotenv.config({ path: './.env' });
 
 connectDB();
 

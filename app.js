@@ -31,7 +31,7 @@ app.use(hpp());
 app.use(mongoSanitize());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100
+  max: 100,
 });
 
 //rate limit
@@ -42,5 +42,14 @@ app.use('/api/v1/tours', toursRoutes);
 app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/reviews', reviewsRoute);
 app.use(globalError);
+
+if (process.env.NODE_ENV === 'production') {
+  //set static folder
+  app.use(express.static('./public'));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '/public/index.html'));
+  });
+}
 
 module.exports = app;
