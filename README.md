@@ -1,6 +1,6 @@
 # GeoTours API
 
-> Backend Api for GeoTours application which is a tour directory.You can check out the postman documentation [GeoTours API](https://documenter.getpostman.com/view/5936515/SzKSRyTa)
+> Backend Api for GeoTours application which is a tour directory.You can check out the postman documentation [GeoTours API](https://documenter.getpostman.com/view/5936515/SzKSRyTa) and the live api [here](https://geo-tours.herokuapp.com/)
 
 ## PROJECT ARCHITECTURE
 
@@ -63,6 +63,11 @@ C:.
 
 The flow of actions across the API can best be described with this diagram.
 ![API flow](./public/new.png)
+
+## API Documentation
+
+The API documentation was done using docgen.
+![documentation](./public/doc.png)
 
 ## Usage
 
