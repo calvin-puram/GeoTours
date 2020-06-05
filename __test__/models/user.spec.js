@@ -5,6 +5,7 @@
 /* eslint-disable no-undef */
 
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const Users = require('../../models/Users');
 const DB = require('../utils/db');
@@ -29,6 +30,15 @@ describe('the user model', () => {
     );
     expect(hashedPassword).toBeTruthy();
     expect(createdUser.passwordConfirm).not.toBeDefined();
+  });
+
+  it('should send jwt token to user', async () => {
+    const token = await createdUser.sendJWT();
+    const verifiedUser = jwt.verify(token, process.env.JWT_SECRET);
+    const newUser = await Users.findById(verifiedUser.id);
+
+    expect(newUser.name).toBe(user.name);
+    expect(verifiedUser.id).toBe(JSON.parse(JSON.stringify(newUser._id)));
   });
 
   afterAll(async () => {

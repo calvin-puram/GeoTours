@@ -8,9 +8,7 @@ const catchAsync = require('../utils/catchAsync');
 const sendEmail = require('../utils/email');
 
 const sendToken = (user, res, statusCode) => {
-  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES
-  });
+  const token = user.sendJWT();
 
   const cookieOptions = {
     httpOnly: true,

@@ -84,6 +84,13 @@ UserSchema.methods.comparePassword = async (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
+// send jwt to user
+UserSchema.methods.sendJWT = function() {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES
+  });
+};
+
 //check password
 UserSchema.methods.checkpassword = function(jwtTimestamp) {
   if (this.passwordChangeAt) {
