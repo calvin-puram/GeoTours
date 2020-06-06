@@ -12,7 +12,7 @@ const app = () => supertest(server);
 const DB = require('../../utils/db');
 const Users = require('../../../models/Users');
 
-describe('The update user process', () => {
+describe('The delete user process', () => {
   const user = {
     name: 'calvin',
     email: 'cpuram1@gmail.com',
@@ -28,34 +28,29 @@ describe('The update user process', () => {
     passwordConfirm: '2begood4'
   };
 
-  const updatedUser = {
-    name: 'john'
-  };
-
   let token;
   let request;
+  let currentUser;
 
   beforeEach(async () => {
     await DB.connectDB();
-    newUser = await Users.create(newUser);
-    request = (url, data) => {
+    currentUser = await Users.create(user);
+    request = url => {
       return app()
-        .patch(url)
-        .set('authorization', `Bearer ${token}`)
-        .send(data);
+        .delete(url)
+        .set('authorization', `Bearer ${token}`);
     };
   });
 
-  it('should update new user ', async () => {
-    const currentUser = await Users.create(user);
-    token = currentUser.sendJWT();
+  it('should delete a user ', async () => {
+    newUser = await Users.create(newUser);
     const id = newUser._id;
+    token = currentUser.sendJWT();
 
-    const res = await request(`/api/v1/users/${id}`, updatedUser);
+    const res = await request(`/api/v1/users/${id}`);
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
-    expect(res.body.data).toBeDefined();
   });
 
   afterEach(async () => {

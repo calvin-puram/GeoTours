@@ -14,7 +14,7 @@ const Users = require('../../../models/Users');
 
 const UPDATEME_URL = '/api/v1/users/deleteMe';
 
-describe('The update me process', () => {
+describe('The delete me process', () => {
   const user = {
     name: 'calvin',
     email: 'cpuram1@gmail.com',

@@ -8,9 +8,10 @@ exports.deleteHandler = model =>
     const doc = await model.findByIdAndRemove(req.params.id);
 
     if (!doc) {
-      return next(
-        new AppError(`No Resource Found With id: ${req.params.id}`, 404)
-      );
+      return res.status(404).json({
+        success: false,
+        msg: `No Resource Found With id: ${req.params.id}`
+      });
     }
 
     res.status(200).json({
@@ -22,20 +23,23 @@ exports.deleteHandler = model =>
 //@desc   Update Resource
 exports.updateHandler = model =>
   catchAsync(async (req, res, next) => {
-    const doc = await model.findByIdAndUpdate(req.params.id, req.body, {
+    const doc = await model.findById(req.params.id);
+
+    if (!doc) {
+      return res.status(404).json({
+        success: false,
+        msg: `No Resource Found With id: ${req.params.id}`
+      });
+    }
+
+    const newDoc = await model.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true
     });
 
-    if (!doc) {
-      return next(
-        new AppError(`No Resource Found With id: ${req.params.id}`, 404)
-      );
-    }
-
     res.status(200).json({
       success: true,
-      data: doc
+      data: newDoc
     });
   });
 
