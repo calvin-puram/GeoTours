@@ -61,6 +61,20 @@ describe('The login process', () => {
     expect(res.body.msg).toBe('all fields are required');
   });
 
+  it('should throw error if no user with currentPassword', async () => {
+    token = currentUser.sendJWT();
+    updateUser = {
+      currentPassword: '23234rw3r34',
+      newPassword: user.password,
+      passwordConfirm: user.password
+    };
+    const res = await request();
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.msg).toBe('Invalid Credentials');
+  });
+
   afterAll(async () => {
     await Users.deleteMany();
     await DB.closeDB();
