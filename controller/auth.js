@@ -34,6 +34,14 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordResetToken
   } = req.body;
 
+  const checkUser = await Users.findOne({ email });
+
+  if (checkUser) {
+    return res.status(400).json({
+      success: false,
+      msg: 'user already in the database'
+    });
+  }
   const user = await Users.create({
     name,
     email,

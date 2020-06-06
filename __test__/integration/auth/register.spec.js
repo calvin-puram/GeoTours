@@ -42,6 +42,13 @@ describe('The auth.js file', () => {
     expect(response.body.data).toBeDefined();
   });
 
+  it('should check if user exist in the database', async () => {
+    const response = await request();
+
+    expect(response.status).toBe(400);
+    expect(response.body.msg).toBe('user already in the database');
+  });
+
   afterAll(async () => {
     await Users.deleteMany();
     await DB.closeDB();
