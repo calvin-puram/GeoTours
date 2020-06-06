@@ -25,11 +25,10 @@ describe('The update me process', () => {
 
   let token;
   let request;
-  let currentUser;
 
   beforeEach(async () => {
     await DB.connectDB();
-    currentUser = await Users.create(user);
+
     request = () => {
       return app()
         .get(GET_USERS_URL)
@@ -38,6 +37,7 @@ describe('The update me process', () => {
   });
 
   it('should get all user from the database', async () => {
+    const currentUser = await Users.create(user);
     token = currentUser.sendJWT();
 
     const res = await request();
@@ -45,6 +45,18 @@ describe('The update me process', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data).toBeDefined();
+  });
+
+  it('should throw error if user role is not an admin', async () => {
+    user.role = 'user';
+    const currentUser = await Users.create(user);
+    token = currentUser.sendJWT();
+
+    const res = await request();
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.msg).toBe('You are not authorize to perform this action');
   });
 
   afterEach(async () => {

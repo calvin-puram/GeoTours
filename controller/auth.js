@@ -130,9 +130,10 @@ exports.protect = catchAsync(async (req, res, next) => {
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return next(
-        new AppError('You are not authorize to perform this action', 401)
-      );
+      return res.status(401).json({
+        success: false,
+        msg: 'You are not authorize to perform this action'
+      });
     }
     next();
   };
