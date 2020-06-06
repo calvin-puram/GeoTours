@@ -71,7 +71,7 @@ UserSchema.pre('save', function(next) {
 });
 
 //show only active set to true
-UserSchema.pre(/^find/, function(next) {
+UserSchema.pre(/^findBy/, function(next) {
   this.find({ active: true });
   next();
 });

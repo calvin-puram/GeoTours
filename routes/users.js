@@ -13,8 +13,8 @@ router.patch('/resetPassword/:token', auth.resetPassword);
 router.use(auth.protect);
 
 router.patch('/updatePassword', auth.updatePassword);
-router.patch('/updateMe', auth.protect, userController.updateMe);
-router.delete('/deleteMe', auth.protect, userController.deleteMe);
+router.patch('/updateMe', userController.updateMe);
+router.delete('/deleteMe', userController.deleteMe);
 router.get('/myprofile', userController.myprofile, userController.getOneUser);
 
 router.use(auth.restrictTo('admin'));
