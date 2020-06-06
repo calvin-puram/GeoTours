@@ -10,9 +10,10 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   const { email, name } = req.body;
 
   if (req.body.password) {
-    return next(
-      new AppError('you can only update email and name in this route', 401)
-    );
+    return res.status(401).json({
+      success: false,
+      msg: 'you can only update email and name in this route'
+    });
   }
 
   const user = await Users.findByIdAndUpdate(
