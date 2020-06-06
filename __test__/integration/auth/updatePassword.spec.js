@@ -21,7 +21,7 @@ describe('The login process', () => {
     password: '2begood4',
     passwordConfirm: '2begood4'
   };
-  const updateUser = {
+  let updateUser = {
     currentPassword: user.password,
     newPassword: user.password,
     passwordConfirm: user.password
@@ -49,6 +49,16 @@ describe('The login process', () => {
     expect(res.body.success).toBe(true);
     expect(res.body.token).toBeDefined();
     expect(res.body.data).toBeDefined();
+  });
+
+  it('should throw error if user newPassword & currentPassword fields are empty', async () => {
+    token = currentUser.sendJWT();
+    updateUser = {};
+    const res = await request();
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.msg).toBe('all fields are required');
   });
 
   afterAll(async () => {

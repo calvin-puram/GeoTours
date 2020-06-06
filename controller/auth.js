@@ -92,7 +92,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(' ')[1];
   }
-  console.log(token);
 
   if (!token) {
     return res.status(401).json({
@@ -225,13 +224,19 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   const { currentPassword, newPassword, passwordConfirm } = req.body;
 
   if (!currentPassword || !newPassword) {
-    return next(new AppError('all fields are required', 400));
+    return res.status(400).json({
+      success: false,
+      msg: 'all fields are required'
+    });
   }
 
   const user = await Users.findById(req.user.id).select('+password');
 
   if (!user || !(await user.comparePassword(currentPassword, user.password))) {
-    return next(new AppError('Invalid Credentials', 401));
+    return res.status(401).json({
+      success: false,
+      msg: 'Invalid Credentials'
+    });
   }
 
   user.password = newPassword;
