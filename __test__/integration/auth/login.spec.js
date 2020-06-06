@@ -21,7 +21,7 @@ describe('The auth.js file', () => {
     password: '2begood4',
     passwordConfirm: '2begood4'
   };
-  const loginUser = {
+  let loginUser = {
     email: user.email,
     password: user.password
   };
@@ -44,6 +44,15 @@ describe('The auth.js file', () => {
     expect(res.body.success).toBe(true);
     expect(res.body.token).toBeDefined();
     expect(res.body.data).toBeDefined();
+  });
+
+  it('should throw error if no password or email is provided ', async () => {
+    loginUser = {};
+    const res = await request();
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.msg).toBe('email and password are required');
   });
 
   afterAll(async () => {
