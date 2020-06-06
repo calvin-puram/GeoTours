@@ -82,21 +82,6 @@ exports.login = catchAsync(async (req, res, next) => {
   sendToken(user, res, 201);
 });
 
-//@desc     logout Users / clear token
-//@route    Get api/v1/users/logout
-//@access   private
-exports.logout = catchAsync(async (req, res, next) => {
-  res.cookie('token', 'none', {
-    expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
-  });
-
-  res.status(200).json({
-    success: true,
-    data: {}
-  });
-});
-
 //@desc   protect route
 //@route  middleware
 exports.protect = catchAsync(async (req, res, next) => {
@@ -161,13 +146,19 @@ exports.restrictTo = (...roles) => {
 //@access public
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   if (!req.body.email) {
-    return next(new AppError('email field is required', 400));
+    return res.status(400).json({
+      success: false,
+      msg: 'email field is required'
+    });
   }
 
   const user = await Users.findOne({ email: req.body.email });
 
   if (!user) {
-    return next(new AppError('this email is not registered', 401));
+    return res.status(401).json({
+      success: false,
+      msg: 'this email is not registered'
+    });
   }
 
   const resetToken = user.forgotPasswordToken();
@@ -208,7 +199,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 exports.resetPassword = catchAsync(async (req, res, next) => {
   const hashedToken = crypto
     .createHash('sha256')
-    .update(req.params.token)
+    .update()
     .digest('hex');
 
   const user = await Users.findOne({

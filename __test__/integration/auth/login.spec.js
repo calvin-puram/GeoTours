@@ -14,7 +14,7 @@ const Users = require('../../../models/Users');
 
 const LOGIN_URL = '/api/v1/users/login';
 
-describe('The auth.js file', () => {
+describe('The login process', () => {
   const user = {
     name: 'calvin',
     email: 'cpuram1@gmail.com',
