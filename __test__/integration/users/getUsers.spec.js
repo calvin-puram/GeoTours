@@ -12,14 +12,15 @@ const app = () => supertest(server);
 const DB = require('../../utils/db');
 const Users = require('../../../models/Users');
 
-const MYPROFILE_URL = '/api/v1/users/myprofile';
+const GET_USERS_URL = '/api/v1/users';
 
 describe('The update me process', () => {
   const user = {
     name: 'calvin',
     email: 'cpuram1@gmail.com',
     password: '2begood4',
-    passwordConfirm: '2begood4'
+    passwordConfirm: '2begood4',
+    role: 'admin'
   };
 
   let token;
@@ -31,12 +32,12 @@ describe('The update me process', () => {
     currentUser = await Users.create(user);
     request = () => {
       return app()
-        .get(MYPROFILE_URL)
+        .get(GET_USERS_URL)
         .set('authorization', `Bearer ${token}`);
     };
   });
 
-  it('should get user profile page', async () => {
+  it('should get all user from the database', async () => {
     token = currentUser.sendJWT();
 
     const res = await request();
