@@ -86,15 +86,13 @@ exports.login = catchAsync(async (req, res, next) => {
 //@route  middleware
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
-  if (req.body) {
-    // eslint-disable-next-line prefer-destructuring
-    token = req.body;
-  } else if (
+  if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
   }
+  console.log(token);
 
   if (!token) {
     return res.status(401).json({
