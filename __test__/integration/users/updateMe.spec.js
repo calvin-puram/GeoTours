@@ -26,7 +26,7 @@ describe('The update me process', () => {
   let request;
   let currentUser;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     await DB.connectDB();
     currentUser = await Users.create(user);
     request = () => {
@@ -50,7 +50,19 @@ describe('The update me process', () => {
     );
   });
 
-  afterAll(async () => {
+  it('should update user in the database', async () => {
+    token = currentUser.sendJWT();
+    updateUser.name = 'calvin job';
+    updateUser.email = 'cpuram@gmail.com';
+    updateUser.password = undefined;
+    const res = await request();
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data).toBeDefined();
+  });
+
+  afterEach(async () => {
     await Users.deleteMany();
     await DB.closeDB();
   });
