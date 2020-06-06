@@ -73,7 +73,10 @@ exports.login = catchAsync(async (req, res, next) => {
   const user = await Users.findOne({ email }).select('+password');
 
   if (!user || !(await user.comparePassword(password, user.password))) {
-    return next(new AppError(`Invalid credential`, 401));
+    return res.status(401).json({
+      success: false,
+      msg: 'Invalid credential'
+    });
   }
 
   sendToken(user, res, 201);

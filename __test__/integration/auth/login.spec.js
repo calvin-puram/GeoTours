@@ -55,6 +55,18 @@ describe('The auth.js file', () => {
     expect(res.body.msg).toBe('email and password are required');
   });
 
+  it('if no user or invalid password should throw error', async () => {
+    loginUser = {
+      email: 'xyz@gmail.com',
+      password: '2begoduju'
+    };
+    const res = await request();
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.msg).toBe('Invalid credential');
+  });
+
   afterAll(async () => {
     await Users.deleteMany();
     await DB.closeDB();
