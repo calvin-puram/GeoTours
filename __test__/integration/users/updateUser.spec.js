@@ -12,7 +12,7 @@ const app = () => supertest(server);
 const DB = require('../../utils/db');
 const Users = require('../../../models/Users');
 
-describe('The create user process', () => {
+describe('The update user process', () => {
   const user = {
     name: 'calvin',
     email: 'cpuram1@gmail.com',
@@ -23,9 +23,7 @@ describe('The create user process', () => {
 
   const newUser = {
     name: 'calvin',
-    email: 'puram1@gmail.com',
-    password: '2begood4',
-    passwordConfirm: '2begood4'
+    email: 'puram1@gmail.com'
   };
 
   let token;
@@ -36,7 +34,7 @@ describe('The create user process', () => {
 
     request = url => {
       return app()
-        .post(url)
+        .patch(url)
         .set('authorization', `Bearer ${token}`)
         .send(newUser);
     };
@@ -45,10 +43,11 @@ describe('The create user process', () => {
   it('should create new user ', async () => {
     const currentUser = await Users.create(user);
     token = currentUser.sendJWT();
+    const id = currentUser._id;
 
-    const res = await request(`/api/v1/users/`);
+    const res = await request(`/api/v1/users/${id}`);
 
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data).toBeDefined();
   });
