@@ -64,7 +64,10 @@ exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return next(new AppError('email and password are required', 400));
+    return res.status(400).json({
+      success: true,
+      msg: 'email and password are required'
+    });
   }
 
   const user = await Users.findOne({ email }).select('+password');
