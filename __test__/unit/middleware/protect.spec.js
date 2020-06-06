@@ -7,17 +7,7 @@
 const DB = require('../../utils/db');
 const Users = require('../../../models/Users');
 const { protect } = require('../../../controller/auth');
-
-class Response {
-  status(status) {
-    this.status = status;
-    return this;
-  }
-
-  json(data) {
-    return data;
-  }
-}
+const Response = require('../../utils/response');
 
 describe('the protect middleware', () => {
   const user = {
