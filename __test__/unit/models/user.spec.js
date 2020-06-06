@@ -7,8 +7,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const Users = require('../../models/Users');
-const DB = require('../utils/db');
+const Users = require('../../../models/Users');
+const DB = require('../../utils/db');
 
 describe('the user model', () => {
   const user = {

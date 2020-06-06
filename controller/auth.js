@@ -10,24 +10,12 @@ const sendEmail = require('../utils/email');
 const sendToken = (user, res, statusCode) => {
   const token = user.sendJWT();
 
-  const cookieOptions = {
-    httpOnly: true,
-    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-  };
-
-  if (process.env.NODE_ENV === 'production') {
-    cookieOptions.secure = true;
-  }
-
   user.password = undefined;
-  res
-    .cookie('token', token, cookieOptions)
-    .status(statusCode)
-    .json({
-      success: true,
-      token,
-      data: user
-    });
+  res.status(statusCode).json({
+    success: true,
+    token,
+    data: user
+  });
 };
 
 //@desc   Register Users
@@ -99,33 +87,40 @@ exports.logout = catchAsync(async (req, res, next) => {
 //@route  middleware
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
-  if (
+  if (req.body) {
+    // eslint-disable-next-line prefer-destructuring
+    token = req.body;
+  } else if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
-  } else if (req.cookies.token) {
-    // eslint-disable-next-line prefer-destructuring
-    token = req.cookies.token;
   }
 
   if (!token) {
-    return next(new AppError('you are not logged in', 401));
+    return res.status(401).json({
+      success: false,
+      msg: 'you are not logged in'
+    });
   }
 
   const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   // check if user exist
-  const currentUser = await Users.findById(decode.id).select('+password');
+  const currentUser = await Users.findById(decode.id);
 
   if (!currentUser) {
-    return next(new AppError('user no longer exist', 401));
+    return res.status(401).json({
+      success: false,
+      msg: 'user no longer exist'
+    });
   }
 
   if (currentUser.checkpassword(decode.iat)) {
-    return next(
-      new AppError('this user recently changed his password. login again', 401)
-    );
+    return res.status(401).json({
+      success: false,
+      msg: 'this user recently changed his password. login again'
+    });
   }
 
   req.user = currentUser;
