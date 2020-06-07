@@ -1,4 +1,4 @@
-module.default = class Response {
+module.exports = class Response {
   status(status) {
     this.status = status;
     return this;
