@@ -13,9 +13,7 @@ const DB = require('../../utils/db');
 const Tours = require('../../../models/Tours');
 const Users = require('../../../models/Users');
 
-const CREATE_TOUR_URL = '/api/v1/tours';
-
-describe('The create tour process', () => {
+describe('The get single tour process', () => {
   const user = {
     name: 'calvin',
     email: 'cpuram1@gmail.com',
@@ -40,22 +38,24 @@ describe('The create tour process', () => {
   };
 
   let admin;
+
   beforeEach(async () => {
     await DB.connectDB();
     admin = await Users.create(user);
-    request = token => {
+    await Tours.create(data);
+    request = (url, token) => {
       return app()
-        .post(CREATE_TOUR_URL)
-        .set('authorization', `Bearer ${token}`)
-        .send(data);
+        .get(url)
+        .set('authorization', `Bearer ${token}`);
     };
   });
 
-  it('should create  tours', async () => {
+  it('should get single tour with given id', async () => {
     const token = await admin.sendJWT();
-    const res = await request(token);
+    const singleTour = await Tours.findOne({ name: 'The Forest Hiker' });
+    const res = await request(`/api/v1/tours/${singleTour._id}`, token);
 
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data).toBeDefined();
   });
