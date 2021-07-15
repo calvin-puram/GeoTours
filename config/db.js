@@ -3,7 +3,7 @@ const chalk = require('chalk');
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI_TEST, {
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
       useCreateIndex: true,
       useNewUrlParser: true,
       useFindAndModify: false,

@@ -1,6 +1,8 @@
 const { promisify } = require('util');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
+const jwtDecode = require('jwt-decode');
 
 const Users = require('../models/Users');
 const AppError = require('../utils/appError');
@@ -13,8 +15,7 @@ const sendToken = (user, res, statusCode) => {
   user.password = undefined;
   res.status(statusCode).json({
     success: true,
-    token,
-    data: user
+    token
   });
 };
 
@@ -80,6 +81,52 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   sendToken(user, res, 201);
+});
+
+//@desc   social login
+//@route  Get api/v1/auth/social
+//@access public
+exports.social = catchAsync(async (req, res, next) => {
+  const userdata = {};
+
+  if (req.params.provider === 'google') {
+    userdata.client_secret = process.env.GOOGLE_CLIENT_SECRET;
+    userdata.code = req.body.code;
+    userdata.client_id = req.body.client_id;
+    userdata.redirect_uri = req.body.redirect_uri;
+    userdata.grant_type = 'authorization_code';
+  }
+
+  if (req.params.provider === 'facebook') {
+    userdata.client_secret = process.env.FACEBOOK_CLIENT_SECRET;
+  }
+
+  try {
+    const { data } = await axios.post(
+      'https://oauth2.googleapis.com/token',
+      userdata
+    );
+    const user = jwtDecode(data.id_token);
+    const checkUser = await Users.findOne({ email: user.email });
+
+    if (!checkUser) {
+      const newUser = await Users.create({
+        name: user.name,
+        email: user.email,
+        photo: user.picture,
+        password: user.at_hash,
+        passwordConfirm: user.at_hash
+      });
+
+      return sendToken(newUser, res, 201);
+    }
+
+    sendToken(checkUser, res, 201);
+  } catch (err) {
+    if (err) {
+      return next(new AppError(err.response.data.error_description, 400));
+    }
+  }
 });
 
 //@desc   protect route
