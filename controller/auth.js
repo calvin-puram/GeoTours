@@ -110,7 +110,7 @@ exports.social = catchAsync(async (req, res, next) => {
     const checkUser = await Users.findOne({ email: user.email });
 
     if (!checkUser) {
-      const newUser = await Users.create({
+      await Users.create({
         name: user.name,
         email: user.email,
         photo: user.picture,
@@ -118,10 +118,16 @@ exports.social = catchAsync(async (req, res, next) => {
         passwordConfirm: user.at_hash
       });
 
-      return sendToken(newUser, res, 201);
+      return res.status(200).json({
+        success: true,
+        _token: data.id_token
+      });
     }
 
-    sendToken(checkUser, res, 201);
+    res.status(200).json({
+      success: true,
+      _token: data.id_token
+    });
   } catch (err) {
     if (err) {
       return next(new AppError(err.response.data.error_description, 400));
