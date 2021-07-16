@@ -131,9 +131,9 @@ exports.social = catchAsync(async (req, res, next) => {
     userdata.client_secret = process.env.FACEBOOK_CLIENT_SECRET;
 
     try {
-      const accessToken = getAccessTokenFromCode(userdata);
+      const accessToken = await getAccessTokenFromCode(userdata);
 
-      const user = getFacebookUserData(accessToken);
+      const user = await getFacebookUserData(accessToken);
       console.log(user);
       if (!user.email) {
         return next(new AppError('user email not found', 400));
