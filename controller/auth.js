@@ -122,7 +122,7 @@ exports.social = catchAsync(async (req, res, next) => {
       sendToken(checkUser, res, 201);
     } catch (err) {
       if (err) {
-        return next(new AppError(err.response.data.error.message, 400));
+        return next(new AppError(err.response.data.error_description, 400));
       }
     }
   }
@@ -136,7 +136,7 @@ exports.social = catchAsync(async (req, res, next) => {
       const user = getFacebookUserData(accessToken);
 
       if (!user.email) {
-        return next(new AppError('use email not found', 400));
+        return next(new AppError('user email not found', 400));
       }
 
       const checkUser = await Users.findOne({ email: user.email });
@@ -156,7 +156,7 @@ exports.social = catchAsync(async (req, res, next) => {
       sendToken(checkUser, res, 201);
     } catch (err) {
       if (err) {
-        return next(new AppError(err.response.data.error_description, 400));
+        return next(new AppError(err.response.data.error.message, 400));
       }
     }
   }
