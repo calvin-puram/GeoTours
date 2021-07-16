@@ -134,6 +134,11 @@ exports.social = catchAsync(async (req, res, next) => {
       const accessToken = getAccessTokenFromCode(userdata);
 
       const user = getFacebookUserData(accessToken);
+
+      if (!user.email) {
+        return next(new AppError('use email not found', 400));
+      }
+
       const checkUser = await Users.findOne({ email: user.email });
 
       if (!checkUser) {
