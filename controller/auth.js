@@ -8,6 +8,8 @@ const Users = require('../models/Users');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const sendEmail = require('../utils/email');
+const getFacebookUserData = require('../utils/getfacebookuserdata');
+const getAccessTokenFromCode = require('../utils/getFacebookAccessToken');
 
 const sendToken = (user, res, statusCode) => {
   const token = user.sendJWT();
@@ -87,44 +89,70 @@ exports.login = catchAsync(async (req, res, next) => {
 //@route  Get api/v1/auth/social
 //@access public
 exports.social = catchAsync(async (req, res, next) => {
-  const userdata = {};
+  const userdata = {
+    client_id: req.body.client_id,
+    redirect_uri: req.body.redirect_uri,
+    code: req.body.code
+  };
 
   if (req.params.provider === 'google') {
     userdata.client_secret = process.env.GOOGLE_CLIENT_SECRET;
-    userdata.code = req.body.code;
-    userdata.client_id = req.body.client_id;
-    userdata.redirect_uri = req.body.redirect_uri;
     userdata.grant_type = 'authorization_code';
+
+    try {
+      const { data } = await axios.post(
+        'https://oauth2.googleapis.com/token',
+        userdata
+      );
+      const user = jwtDecode(data.id_token);
+      const checkUser = await Users.findOne({ email: user.email });
+
+      if (!checkUser) {
+        const newUser = await Users.create({
+          name: user.name,
+          email: user.email,
+          photo: user.picture,
+          password: user.at_hash,
+          passwordConfirm: user.at_hash
+        });
+
+        return sendToken(newUser, res, 201);
+      }
+
+      sendToken(checkUser, res, 201);
+    } catch (err) {
+      if (err) {
+        return next(new AppError(err.response.data.error.message, 400));
+      }
+    }
   }
 
   if (req.params.provider === 'facebook') {
     userdata.client_secret = process.env.FACEBOOK_CLIENT_SECRET;
-  }
 
-  try {
-    const { data } = await axios.post(
-      'https://oauth2.googleapis.com/token',
-      userdata
-    );
-    const user = jwtDecode(data.id_token);
-    const checkUser = await Users.findOne({ email: user.email });
+    try {
+      const accessToken = getAccessTokenFromCode(userdata);
 
-    if (!checkUser) {
-      const newUser = await Users.create({
-        name: user.name,
-        email: user.email,
-        photo: user.picture,
-        password: user.at_hash,
-        passwordConfirm: user.at_hash
-      });
+      const user = getFacebookUserData(accessToken);
+      const checkUser = await Users.findOne({ email: user.email });
 
-      return sendToken(newUser, res, 201);
-    }
+      if (!checkUser) {
+        const newUser = await Users.create({
+          name: `${user.first_name} ${user.last_name}`,
+          email: user.email,
+          photo: user.picture,
+          password: user.id,
+          passwordConfirm: user.id
+        });
 
-    sendToken(checkUser, res, 201);
-  } catch (err) {
-    if (err) {
-      return next(new AppError(err.response.data.error_description, 400));
+        return sendToken(newUser, res, 201);
+      }
+
+      sendToken(checkUser, res, 201);
+    } catch (err) {
+      if (err) {
+        return next(new AppError(err.response.data.error_description, 400));
+      }
     }
   }
 });
