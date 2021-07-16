@@ -145,7 +145,7 @@ exports.social = catchAsync(async (req, res, next) => {
         const newUser = await Users.create({
           name: `${user.first_name} ${user.last_name}`,
           email: user.email,
-          photo: user.picture,
+          photo: user.picture.data.url,
           password: user.id,
           passwordConfirm: user.id
         });
